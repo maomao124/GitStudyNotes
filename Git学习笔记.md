@@ -989,5 +989,164 @@ PS C:\Users\mao\Desktop\redis-cli\Redis_client>
 
 
 
+## 配置 Git 忽略文件
+
+
+
+创建忽略规则文件 xxxx.ignore（前缀名随便起，建议是 git.ignore）
+
+这个文件的存放位置原则上在哪里都可以，为了便于让~/.gitconfig 文件引用，建议也放在用户目录下
+
+
+
+git.ignore 文件模版内容：
+
+```sh
+# Compiled class file
+*.class
+# Log file
+*.log
+# BlueJ files
+*.ctxt
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# virtual machine crash logs, see 
+http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+.classpath
+.project
+.settings
+target
+.idea
+*.iml
+
+```
+
+
+
+在.gitconfig 文件中引用忽略配置文件
+
+```sh
+[user]
+name =
+email =
+[core]
+excludesfile = C:/Users/asus/git.ignore
+
+```
+
+注意：excludesfile要使用“正斜线（/）”，不要使用“反斜线（\）”
+
+
+
+
+
+## 注意事项
+
+* push 是将本地库代码推送到远程库，如果本地库代码跟远程库代码版本不一致， push 的操作是会被拒绝的。也就是说，要想 push 成功，一定要保证本地库的版本要比远程 库的版本高！因此一个成熟的程序员在动手改本地代码之前，一定会先检查下远程库跟本地 代码的区别！如果本地的代码版本已经落后，切记要先 pull 拉取一下远程库的代码，将本地 代码更新到最新以后，然后再修改，提交，推送
+* pull 是拉取远端仓库代码到本地，如果远程库代码和本地库代码不一致，会自动 合并，如果自动合并失败，还会涉及到手动解决冲突的问题
+
+
+
+
+
+
+
+# GitLab
+
+GitLab 是由 GitLabInc.开发，使用 MIT 许可证的基于网络的 Git 仓库管理工具，且具有 wiki 和 issue 跟踪功能。使用 Git 作为代码管理工具，并在此基础上搭建起来的 web 服务。 GitLab 由乌克兰程序员 DmitriyZaporozhets 和 ValerySizov 开发，它使用 Ruby 语言写 成。后来，一些部分用 Go 语言重写。截止 2018 年 5 月，该公司约有 290 名团队成员，以 及 2000 多名开源贡献者。GitLab 被 IBM，Sony，JülichResearchCenter，NASA，Alibaba， Invincea，O’ReillyMedia，Leibniz-Rechenzentrum(LRZ)，CERN，SpaceX 等组织使用。
+
+
+
+## Docker安装
+
+在设置其他所有内容之前，请配置一个新的环境变量 `$GITLAB_HOME`，指向配置、日志和数据文件所在的目录。 确保该目录存在并且已授予适当的权限。
+
+对于 Linux 用户，将路径设置为 `/srv/gitlab`
+
+
+
+```sh
+export GITLAB_HOME=/srv/gitlab
+```
+
+
+
+GitLab 容器使用主机装载的卷来存储持久数据
+
+|       本地位置        |     容器位置      |             使用              |
+| :-------------------: | :---------------: | :---------------------------: |
+|  `$GITLAB_HOME/data`  | `/var/opt/gitlab` |    用于存储应用程序数据。     |
+|  `$GITLAB_HOME/logs`  | `/var/log/gitlab` |        用于存储日志。         |
+| `$GITLAB_HOME/config` |   `/etc/gitlab`   | 用于存储极狐GitLab 配置文件。 |
+
+
+
+
+
+创建一个 `docker-compose.yml` 文件：
+
+```sh
+version: '3.6'
+services:
+  web:
+    image: 'registry.gitlab.cn/omnibus/gitlab-jh:latest'
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.example.com'
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+    shm_size: '256m'
+```
+
+
+
+启动：
+
+```sh
+docker-compose up -d
+```
+
+
+
+
+
+
+
+----
+
+end
+
+----
+
+by mao
+
+2022  07  01
+
+----
+
+
+
+
+
+
+
 
 
